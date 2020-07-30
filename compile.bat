@@ -1,0 +1,3 @@
+@echo off
+echo Compiling...
+gcc -O0 -L lib -I include .\src\t.c -o t -lmingw32 -lSDL2main -lSDL2 -lsdl_circle -lsdl_triangle && powershell write-host -fore Green Compile success && .\t.exe
