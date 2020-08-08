@@ -10,13 +10,6 @@
 #define SCREEN_HEIGHT 1080
 #define GROUND_Y SCREEN_HEIGHT * 0.75
 
-typedef struct Man Man;
-struct Man {
-    int manX;
-    int manLegs;
-    int manLegsDirection;
-};
-
 typedef struct Table Table;
 struct Table {
     int originX;
@@ -26,8 +19,6 @@ struct Table {
 
 // void play(SDL_Renderer *renderer, Table* table);
 void play(SDL_Renderer *renderer, Table* table, int* state_array);
-void drawMan(SDL_Renderer *renderer, Man* man);
-void drawRain(SDL_Renderer *renderer, int manX);
 void drawBoard(SDL_Renderer *renderer, Table *table);
 void drawPieceOnBoard(SDL_Renderer *renderer, Table *table, int position, char shape);
 void drawCross(SDL_Renderer *renderer, int crossSize, int x, int y);
