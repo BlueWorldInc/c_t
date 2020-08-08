@@ -54,6 +54,7 @@ int main(int argc, char *argv[])
         // int state_of_game[9] = {0, 1, 0, 2, 1, 2, 0, 1, 2};
         int state_of_game[9] = {0};
         int i = 0;
+        int turn = 0;
 
         while (run) {
             SDL_Event event;
@@ -67,7 +68,7 @@ int main(int argc, char *argv[])
                         switch(event.key.keysym.sym) {
                             case SDLK_r:
                                 printf("r is pressed \n");
-                                resetStateOfGame(state_of_game);
+                                resetStateOfGame(state_of_game, &turn);
                                 break;
                             default: 
                                 run = SDL_FALSE;
@@ -75,8 +76,11 @@ int main(int argc, char *argv[])
                         }
                         break;
                     case SDL_MOUSEBUTTONDOWN:
-                        // printf("Mouse clicked, position: %d\n", positionOfClickOnBoard(table, event.button.x, event.button.y));
-                        modifyStateOfGame(state_of_game, positionOfClickOnBoard(table, event.button.x, event.button.y));
+                        { 
+                            int az = positionOfClickOnBoard(table, event.button.x, event.button.y);
+                            if (az >= 0) turn++;
+                            modifyStateOfGame(state_of_game, positionOfClickOnBoard(table, event.button.x, event.button.y), turn % 2);
+                        }
                         break;
                 }
 
@@ -195,14 +199,19 @@ void drawPieceOnBoard(SDL_Renderer *renderer, Table *table, int position, char s
     }
 }
 
-void modifyStateOfGame(int* state_of_game, int position) {
-    state_of_game[position] = 1;
+void modifyStateOfGame(int* state_of_game, int position, int turn) {
+    if (turn == 0) {
+        state_of_game[position] = 1;
+    } else {
+        state_of_game[position] = 2;
+    }
 }
 
-void resetStateOfGame(int* state_of_game) {
+void resetStateOfGame(int* state_of_game, int* turn) {
     for (int i = 0; i < 9; i++) {
         state_of_game[i] = 0;
     }
+    (*turn) = 0;
 }
 
 int positionOfClickOnBoard(Table* table, int mousePositionX, int mousePositionY) {
