@@ -57,22 +57,34 @@ int main(int argc, char *argv[])
 
         while (run) {
             SDL_Event event;
-            SDL_PollEvent(&event);
-            
-            play(renderer, table, state_of_game);
-            if (i < 9) {
-                // state_array[i] == 1;
+
+
+            // used https://wiki.libsdl.org/SDL_PollEvent to make it work without stuttering
+            while (SDL_PollEvent(&event)) {
+
+                switch (event.type) {
+                    case SDL_KEYDOWN:
+                        switch(event.key.keysym.sym) {
+                            case SDLK_r:
+                                printf("r is pressed \n");
+                                resetStateOfGame(state_of_game);
+                                break;
+                            default: 
+                                run = SDL_FALSE;
+                                break;
+                        }
+                        break;
+                    case SDL_MOUSEBUTTONDOWN:
+                        // printf("Mouse clicked, position: %d\n", positionOfClickOnBoard(table, event.button.x, event.button.y));
+                        modifyStateOfGame(state_of_game, positionOfClickOnBoard(table, event.button.x, event.button.y));
+                        break;
+                }
+
             }
 
-            SDL_WaitEvent(&event);
-            switch (event.type) {
-                case SDL_KEYDOWN:
-                    run = SDL_FALSE;
-                    break;
-                case SDL_MOUSEBUTTONUP:
-                    printf("Mouse clicked, position: %d\n", positionOfClick(table, event.button.x, event.button.y));
-                    break;
-            }
+            play(renderer, table, state_of_game);
+            SDL_Delay(30);
+
         }
         SDL_DestroyWindow(window);
     }
@@ -183,11 +195,17 @@ void drawPieceOnBoard(SDL_Renderer *renderer, Table *table, int position, char s
     }
 }
 
-void modifyStateOfGame(int* state_of_game, int mousePositionX, int mousePositionY) {
-
+void modifyStateOfGame(int* state_of_game, int position) {
+    state_of_game[position] = 1;
 }
 
-int positionOfClick(Table* table, int mousePositionX, int mousePositionY) {
+void resetStateOfGame(int* state_of_game) {
+    for (int i = 0; i < 9; i++) {
+        state_of_game[i] = 0;
+    }
+}
+
+int positionOfClickOnBoard(Table* table, int mousePositionX, int mousePositionY) {
     if (mousePositionX < (*table).originX 
     || mousePositionX > (*table).originX + (*table).size 
     || mousePositionY < (*table).originY
