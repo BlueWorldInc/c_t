@@ -51,22 +51,26 @@ int main(int argc, char *argv[])
         (*table).originX = SCREEN_WIDTH / 3;
         (*table).originY = SCREEN_HEIGHT / 10;
 
-        int state_array[9] = {0, 1, 0, 2, 1, 2, 0, 1, 2};
+        // int state_of_game[9] = {0, 1, 0, 2, 1, 2, 0, 1, 2};
+        int state_of_game[9] = {0};
         int i = 0;
 
         while (run) {
             SDL_Event event;
             SDL_PollEvent(&event);
             
-            play(renderer, table, state_array);
+            play(renderer, table, state_of_game);
             if (i < 9) {
                 // state_array[i] == 1;
             }
 
-            SDL_Delay(75);
+            SDL_WaitEvent(&event);
             switch (event.type) {
                 case SDL_KEYDOWN:
                     run = SDL_FALSE;
+                    break;
+                case SDL_MOUSEBUTTONUP:
+                    printf("Mouse clicked, position: %d\n", positionOfClick(table, event.button.x, event.button.y));
                     break;
             }
         }
@@ -77,7 +81,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void play(SDL_Renderer *renderer, Table* table, int* state_array) {
+void play(SDL_Renderer *renderer, Table* table, int* state_of_game) {
     SDL_Color black = {0, 0, 0, 255};
     SDL_Color white = {255, 255, 255, 255};
 
@@ -92,20 +96,12 @@ void play(SDL_Renderer *renderer, Table* table, int* state_array) {
     drawBoard(renderer, table);
     // draw pieces
     for (int i = 0; i < 9; i++) {
-        if (state_array[i] == 1) {
-            drawPieceOnBoard(renderer, table, i, 'c');
-        } else if (state_array[i] == 2) {
-            drawPieceOnBoard(renderer, table, i, 'd');
+        if (state_of_game[i] == 1) {
+            drawPieceOnBoard(renderer, table, i, 'O');
+        } else if (state_of_game[i] == 2) {
+            drawPieceOnBoard(renderer, table, i, 'X');
         }
     }
-    // drawPieceOnBoard(renderer, table, 1, 'd');
-    // drawPieceOnBoard(renderer, table, 2, 'c');
-    // drawPieceOnBoard(renderer, table, 3, 'c');
-    // drawPieceOnBoard(renderer, table, 4, 'd');
-    // drawPieceOnBoard(renderer, table, 5, 'c');
-    // drawPieceOnBoard(renderer, table, 6, 'c');
-    // drawPieceOnBoard(renderer, table, 7, 'd');
-    // drawPieceOnBoard(renderer, table, 8, 'c');
 
     SDL_RenderPresent(renderer);
 }
@@ -179,10 +175,49 @@ void drawPieceOnBoard(SDL_Renderer *renderer, Table *table, int position, char s
                 break;
         }
 
-        if (shape == 'c') {
+        if (shape == 'O') {
             SDL_Ellipse(renderer, x, y, 70, 70);
-        } else if (shape == 'd') {
+        } else if (shape == 'X') {
             drawCross(renderer, 50, x, y);
+        }
+    }
+}
+
+void modifyStateOfGame(int* state_of_game, int mousePositionX, int mousePositionY) {
+
+}
+
+int positionOfClick(Table* table, int mousePositionX, int mousePositionY) {
+    if (mousePositionX < (*table).originX 
+    || mousePositionX > (*table).originX + (*table).size 
+    || mousePositionY < (*table).originY
+    || mousePositionY > (*table).originY + (*table).size) {
+        return -1;
+    } else {
+        if (mousePositionX < (*table).originX + (*table).size / 3) {
+            if (mousePositionY < (*table).originY + (*table).size / 3) {
+                return 0;
+            } else if (mousePositionY < (*table).originY + 2 * (*table).size / 3) {
+                return 3;
+            } else {
+                return 6;
+            }
+        } else if (mousePositionX < (*table).originX + 2 * (*table).size / 3) {
+            if (mousePositionY < (*table).originY + (*table).size / 3) {
+                return 1;
+            } else if (mousePositionY < (*table).originY + 2 * (*table).size / 3) {
+                return 4;
+            } else {
+                return 7;
+            }
+        } else if (mousePositionX < (*table).originX + (*table).size) {
+            if (mousePositionY < (*table).originY + (*table).size / 3) {
+                return 2;
+            } else if (mousePositionY < (*table).originY + 2 * (*table).size / 3) {
+                return 5;
+            } else {
+                return 8;
+            }
         }
     }
 }
