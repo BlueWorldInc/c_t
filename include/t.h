@@ -24,7 +24,8 @@ struct Table {
     int size;
 };
 
-void play(SDL_Renderer *renderer, Table* table);
+// void play(SDL_Renderer *renderer, Table* table);
+void play(SDL_Renderer *renderer, Table* table, int* state_array);
 void drawMan(SDL_Renderer *renderer, Man* man);
 void drawRain(SDL_Renderer *renderer, int manX);
 void drawBoard(SDL_Renderer *renderer, Table *table);

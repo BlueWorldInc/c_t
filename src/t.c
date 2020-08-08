@@ -51,11 +51,17 @@ int main(int argc, char *argv[])
         (*table).originX = SCREEN_WIDTH / 3;
         (*table).originY = SCREEN_HEIGHT / 10;
 
+        int state_array[9] = {0, 1, 0, 2, 1, 2, 0, 1, 2};
+        int i = 0;
+
         while (run) {
             SDL_Event event;
             SDL_PollEvent(&event);
-
-            play(renderer, table);
+            
+            play(renderer, table, state_array);
+            if (i < 9) {
+                // state_array[i] == 1;
+            }
 
             SDL_Delay(75);
             switch (event.type) {
@@ -71,7 +77,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void play(SDL_Renderer *renderer, Table* table) {
+void play(SDL_Renderer *renderer, Table* table, int* state_array) {
     SDL_Color black = {0, 0, 0, 255};
     SDL_Color white = {255, 255, 255, 255};
 
@@ -85,15 +91,21 @@ void play(SDL_Renderer *renderer, Table* table) {
     // draw Board
     drawBoard(renderer, table);
     // draw pieces
-    drawPieceOnBoard(renderer, table, 0, 'c');
-    drawPieceOnBoard(renderer, table, 1, 'd');
-    drawPieceOnBoard(renderer, table, 2, 'c');
-    drawPieceOnBoard(renderer, table, 3, 'c');
-    drawPieceOnBoard(renderer, table, 4, 'd');
-    drawPieceOnBoard(renderer, table, 5, 'c');
-    drawPieceOnBoard(renderer, table, 6, 'c');
-    drawPieceOnBoard(renderer, table, 7, 'd');
-    drawPieceOnBoard(renderer, table, 8, 'c');
+    for (int i = 0; i < 9; i++) {
+        if (state_array[i] == 1) {
+            drawPieceOnBoard(renderer, table, i, 'c');
+        } else if (state_array[i] == 2) {
+            drawPieceOnBoard(renderer, table, i, 'd');
+        }
+    }
+    // drawPieceOnBoard(renderer, table, 1, 'd');
+    // drawPieceOnBoard(renderer, table, 2, 'c');
+    // drawPieceOnBoard(renderer, table, 3, 'c');
+    // drawPieceOnBoard(renderer, table, 4, 'd');
+    // drawPieceOnBoard(renderer, table, 5, 'c');
+    // drawPieceOnBoard(renderer, table, 6, 'c');
+    // drawPieceOnBoard(renderer, table, 7, 'd');
+    // drawPieceOnBoard(renderer, table, 8, 'c');
 
     SDL_RenderPresent(renderer);
 }
@@ -169,7 +181,7 @@ void drawPieceOnBoard(SDL_Renderer *renderer, Table *table, int position, char s
 
         if (shape == 'c') {
             SDL_Ellipse(renderer, x, y, 70, 70);
-        } else {
+        } else if (shape == 'd') {
             drawCross(renderer, 50, x, y);
         }
     }
