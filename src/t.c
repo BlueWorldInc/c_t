@@ -51,15 +51,19 @@ int main(int argc, char *argv[])
         init_error = true;
     }
 
-    TTF_Font *police = TTF_OpenFont("fonts/arial.ttf", 165);
+    TTF_Font *police = TTF_OpenFont("fonts/arial.ttf", 65);
     SDL_Color couleurNoire = {255, 255, 255};
     SDL_Rect position;
-    SDL_Surface* texte = TTF_RenderUTF8_Blended(police, "Salut les Zér0s !", couleurNoire);
-    SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, texte);
+    SDL_Surface* text_player_1 = TTF_RenderUTF8_Blended(police, "Player 1", couleurNoire);
+    SDL_Surface* text_player_2 = TTF_RenderUTF8_Blended(police, "Player 2", couleurNoire);
+    SDL_Texture* texture_player_1 = SDL_CreateTextureFromSurface(renderer, text_player_1);
+    SDL_Texture* texture_player_2 = SDL_CreateTextureFromSurface(renderer, text_player_2);
     int texW = 600;
     int texH = 600;
-    SDL_QueryTexture(texture, NULL, NULL, &texW, &texH);
-    SDL_Rect dstrect = { 100, 100, texW, texH };
+    SDL_QueryTexture(texture_player_1, NULL, NULL, &texW, &texH);
+    SDL_QueryTexture(texture_player_2, NULL, NULL, &texW, &texH);
+    SDL_Rect dstrect_player_1 = { SCREEN_WIDTH * 2 / 100, 100, texW, texH };
+    SDL_Rect dstrect_player_2 = { SCREEN_WIDTH * 98 / 100 - (*text_player_1).w, 100, texW, texH };
 
     if (!init_error)
     {
@@ -142,7 +146,8 @@ int main(int argc, char *argv[])
             }
 
             play(renderer, table, state_of_game);
-            SDL_RenderCopy(renderer, texture, NULL, &dstrect);
+            SDL_RenderCopy(renderer, texture_player_1, NULL, &dstrect_player_1);
+            SDL_RenderCopy(renderer, texture_player_2, NULL, &dstrect_player_2);
             SDL_RenderPresent(renderer);
             SDL_Delay(30);
 
