@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <time.h>
 #include <math.h>
+#include <string.h>
 #include <sdl_circle.h>
 #include <SDL2/SDL.h>
 
@@ -26,4 +27,6 @@ int modifyStateOfGame(int* state_of_game, int position, int turn);
 void resetStateOfGame(int* state_of_game, int* turn);
 int positionOfClickOnBoard(Table* table, int mousePositionX, int mousePositionY);
 int winnerOfRound(int* state_of_game);
+void reverse(char s[]);
+// void itoa(int n, char s[]);
 
