@@ -133,7 +133,8 @@ int main(int argc, char *argv[])
                 texW2 = 600;
                 texH2 = 600;
                 SDL_QueryTexture(texture_turn, NULL, NULL, &texW2, &texH2);
-                // dstrect_turn = { SCREEN_WIDTH * 50 / 100 - (*text_turn).w, 0, texW2, texH2 };
+                dstrect_turn.w = texW2;
+                dstrect_turn.x = SCREEN_WIDTH * 50 / 100 - (*text_turn).w;
 
                 // SDL_RenderPresent(renderer);
 
@@ -161,8 +162,16 @@ int main(int argc, char *argv[])
                                 turn++;
                                 int w =  winnerOfRound(state_of_game);
                                 if (w == 1 || w == 2 ||  w == 3) {
-                                    // printf("round ended, the winner is : %d\n", w);
-                                    text_turn = TTF_RenderUTF8_Blended(police, "Round ended, the winner is", couleurVerte);
+                                    char winner_string_1[100] = "Round ended, the winner is player 1, 'X'";
+                                    char winner_string_2[100] = "Round ended, the winner is player 2, 'O'";
+                                    char tie_string[100] = "Round ended, this is a tie";
+                                    if (w == 1) {
+                                        text_turn = TTF_RenderUTF8_Blended(police, winner_string_1, couleurVerte);
+                                    } else if (w == 2) {
+                                        text_turn = TTF_RenderUTF8_Blended(police, winner_string_2, couleurVerte);
+                                    } else if (w == 3) {
+                                        text_turn = TTF_RenderUTF8_Blended(police, tie_string, couleurBleue);
+                                    }
                                     texture_turn = SDL_CreateTextureFromSurface(renderer, text_turn);
                                     SDL_QueryTexture(texture_turn, NULL, NULL, &texW2, &texH2);
                                     dstrect_turn.w = texW2;
@@ -190,13 +199,11 @@ int main(int argc, char *argv[])
 
                 }
 
-                printf("dstrect_turn.w : %d\n", dstrect_turn.w);
             }
 
             clearScreen(renderer);
             SDL_RenderCopy(renderer, texture_player_1, NULL, &dstrect_player_1);
             SDL_RenderCopy(renderer, texture_player_2, NULL, &dstrect_player_2);
-            printf("dstrect_turn.w : %d\n", dstrect_turn.w);
             SDL_RenderCopy(renderer, texture_turn, NULL, &dstrect_turn);
             play(renderer, table, state_of_game);
             SDL_Delay(30);
