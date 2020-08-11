@@ -226,13 +226,6 @@ void clearScreen(SDL_Renderer* renderer) {
 }
 
 void play(SDL_Renderer *renderer, Table* table, int* state_of_game) {
-    // SDL_Color black = { 0, 0, 0, 255 };
-    // SDL_Color white = { 255, 255, 255, 255 };
-
-    // clear window
-    // clearScreen(renderer);
-    // SDL_SetRenderDrawColor(renderer, white.r, white.g, white.b, white.a);
-
     // draw baseline
     SDL_RenderDrawLine(renderer, 0, GROUND_Y, SCREEN_WIDTH, GROUND_Y);
     // draw Board
