@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
         init_error = true;
     }
 
-    TTF_Font *police = TTF_OpenFont("fonts/arial.ttf", 65);
+    TTF_Font* police = TTF_OpenFont("fonts/arial.ttf", 65);
     SDL_Color couleurBlanche ={ 255, 255, 255 };
     SDL_Rect position;
     SDL_Surface* text_player_1 = TTF_RenderUTF8_Blended(police, "Player 1", couleurBlanche);
@@ -95,9 +95,12 @@ int main(int argc, char *argv[])
 
 
         while (run) {
+
             SDL_Event event;
 
             printf("press r to start the game\n");
+
+            SDL_RenderPresent(renderer);
 
             while (SDL_PollEvent(&event)) {
 
@@ -118,6 +121,7 @@ int main(int argc, char *argv[])
 
             while (!roundEnded) {
 
+
                 char turn_string_2[100] = "Turn: ";
                 char turn_s[100] = "";
                 itoa(turn, turn_s, 10);
@@ -127,7 +131,9 @@ int main(int argc, char *argv[])
                 texW2 = 600;
                 texH2 = 600;
                 SDL_QueryTexture(texture_turn, NULL, NULL, &texW2, &texH2);
-                SDL_Rect dstrect_turn = {SCREEN_WIDTH * 50 / 100 - (*text_turn).w, 0, texW2, texH2};
+                SDL_Rect dstrect_turn ={ SCREEN_WIDTH * 50 / 100 - (*text_turn).w, 0, texW2, texH2 };
+
+                // SDL_RenderPresent(renderer);
 
                 // used https://wiki.libsdl.org/SDL_PollEvent to make it work without stuttering
                 while (SDL_PollEvent(&event)) {
@@ -170,19 +176,21 @@ int main(int argc, char *argv[])
                     }
 
                 }
-                play(renderer, table, state_of_game);
+
+                clearScreen(renderer);
                 SDL_RenderCopy(renderer, texture_player_1, NULL, &dstrect_player_1);
                 SDL_RenderCopy(renderer, texture_player_2, NULL, &dstrect_player_2);
                 SDL_RenderCopy(renderer, texture_turn, NULL, &dstrect_turn);
-                SDL_RenderPresent(renderer);
+                play(renderer, table, state_of_game);
+
                 SDL_Delay(30);
             }
 
-            play(renderer, table, state_of_game);
+            clearScreen(renderer);
             SDL_RenderCopy(renderer, texture_player_1, NULL, &dstrect_player_1);
             SDL_RenderCopy(renderer, texture_player_2, NULL, &dstrect_player_2);
             SDL_RenderCopy(renderer, texture_turn, NULL, &dstrect_turn);
-            SDL_RenderPresent(renderer);
+            play(renderer, table, state_of_game);
             SDL_Delay(30);
 
         }
@@ -194,15 +202,21 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-
-void play(SDL_Renderer *renderer, Table* table, int* state_of_game) {
+void clearScreen(SDL_Renderer* renderer) {
     SDL_Color black ={ 0, 0, 0, 255 };
     SDL_Color white ={ 255, 255, 255, 255 };
-
-    // clear window
     SDL_SetRenderDrawColor(renderer, black.r, black.g, black.b, black.a);
     SDL_RenderClear(renderer);
     SDL_SetRenderDrawColor(renderer, white.r, white.g, white.b, white.a);
+}
+
+void play(SDL_Renderer *renderer, Table* table, int* state_of_game) {
+    // SDL_Color black = { 0, 0, 0, 255 };
+    // SDL_Color white = { 255, 255, 255, 255 };
+
+    // clear window
+    // clearScreen(renderer);
+    // SDL_SetRenderDrawColor(renderer, white.r, white.g, white.b, white.a);
 
     // draw baseline
     SDL_RenderDrawLine(renderer, 0, GROUND_Y, SCREEN_WIDTH, GROUND_Y);

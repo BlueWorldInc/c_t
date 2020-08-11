@@ -28,5 +28,5 @@ void resetStateOfGame(int* state_of_game, int* turn);
 int positionOfClickOnBoard(Table* table, int mousePositionX, int mousePositionY);
 int winnerOfRound(int* state_of_game);
 void reverse(char s[]);
-// void itoa(int n, char s[]);
+void clearScreen(SDL_Renderer* renderer);
 
