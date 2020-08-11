@@ -52,7 +52,9 @@ int main(int argc, char *argv[])
     }
 
     TTF_Font* police = TTF_OpenFont("fonts/arial.ttf", 65);
-    SDL_Color couleurBlanche ={ 255, 255, 255 };
+    SDL_Color couleurBlanche = {255, 255, 255};
+    SDL_Color couleurVerte = {0, 255, 0};
+    SDL_Color couleurBleue = {0, 0, 255};
     SDL_Rect position;
     SDL_Surface* text_player_1 = TTF_RenderUTF8_Blended(police, "Player 1", couleurBlanche);
     SDL_Surface* text_player_2 = TTF_RenderUTF8_Blended(police, "Player 2", couleurBlanche);
@@ -131,7 +133,7 @@ int main(int argc, char *argv[])
                 texW2 = 600;
                 texH2 = 600;
                 SDL_QueryTexture(texture_turn, NULL, NULL, &texW2, &texH2);
-                SDL_Rect dstrect_turn ={ SCREEN_WIDTH * 50 / 100 - (*text_turn).w, 0, texW2, texH2 };
+                // dstrect_turn = { SCREEN_WIDTH * 50 / 100 - (*text_turn).w, 0, texW2, texH2 };
 
                 // SDL_RenderPresent(renderer);
 
@@ -160,13 +162,13 @@ int main(int argc, char *argv[])
                                 int w =  winnerOfRound(state_of_game);
                                 if (w == 1 || w == 2 ||  w == 3) {
                                     // printf("round ended, the winner is : %d\n", w);
-                                    text_turn = TTF_RenderUTF8_Blended(police, "round ended, the winner is", couleurBlanche);
+                                    text_turn = TTF_RenderUTF8_Blended(police, "Round ended, the winner is", couleurVerte);
                                     texture_turn = SDL_CreateTextureFromSurface(renderer, text_turn);
-                                    texW2 = 600;
-                                    texH2 = 600;
                                     SDL_QueryTexture(texture_turn, NULL, NULL, &texW2, &texH2);
-                                    dstrect_turn.x = 600;
-                                    dstrect_turn.y = 600;
+                                    dstrect_turn.w = texW2;
+                                    dstrect_turn.x = SCREEN_WIDTH * 50 / 100 - dstrect_turn.w / 2;
+
+
                                     roundEnded = true;
                                 }
                             }
@@ -176,19 +178,25 @@ int main(int argc, char *argv[])
                     }
 
                 }
+                
+                if (!roundEnded) {
 
-                clearScreen(renderer);
-                SDL_RenderCopy(renderer, texture_player_1, NULL, &dstrect_player_1);
-                SDL_RenderCopy(renderer, texture_player_2, NULL, &dstrect_player_2);
-                SDL_RenderCopy(renderer, texture_turn, NULL, &dstrect_turn);
-                play(renderer, table, state_of_game);
+                    clearScreen(renderer);
+                    SDL_RenderCopy(renderer, texture_player_1, NULL, &dstrect_player_1);
+                    SDL_RenderCopy(renderer, texture_player_2, NULL, &dstrect_player_2);
+                    SDL_RenderCopy(renderer, texture_turn, NULL, &dstrect_turn);
+                    play(renderer, table, state_of_game);
+                    SDL_Delay(30);
 
-                SDL_Delay(30);
+                }
+
+                printf("dstrect_turn.w : %d\n", dstrect_turn.w);
             }
 
             clearScreen(renderer);
             SDL_RenderCopy(renderer, texture_player_1, NULL, &dstrect_player_1);
             SDL_RenderCopy(renderer, texture_player_2, NULL, &dstrect_player_2);
+            printf("dstrect_turn.w : %d\n", dstrect_turn.w);
             SDL_RenderCopy(renderer, texture_turn, NULL, &dstrect_turn);
             play(renderer, table, state_of_game);
             SDL_Delay(30);
