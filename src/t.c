@@ -83,6 +83,7 @@ int main(int argc, char *argv[])
         int i = 0;
         int turn = 0;
         bool roundEnded = true;
+        bool inMenu = true;
 
         char turn_string[100] = "Turn: ";
         char turn_s[100] = "";
@@ -94,6 +95,7 @@ int main(int argc, char *argv[])
         int texH2 = 600;
         SDL_QueryTexture(texture_turn, NULL, NULL, &texW2, &texH2);
         SDL_Rect dstrect_turn ={ SCREEN_WIDTH * 50 / 100 - (*text_turn).w, 0, texW2, texH2 };
+
 
 
         while (run) {
@@ -110,8 +112,12 @@ int main(int argc, char *argv[])
                 case SDL_KEYDOWN:
                     switch (event.key.keysym.sym) {
                     case SDLK_r:
+                        inMenu = false;
                         roundEnded = false;
                         resetStateOfGame(state_of_game, &turn);
+                        break;
+                    case SDLK_ESCAPE:
+                        inMenu = true;
                         break;
                     default:
                         run = SDL_FALSE;
@@ -202,10 +208,14 @@ int main(int argc, char *argv[])
             }
 
             clearScreen(renderer);
+            if (inMenu) {
+                drawMenu(renderer);
+            } else {
             SDL_RenderCopy(renderer, texture_player_1, NULL, &dstrect_player_1);
             SDL_RenderCopy(renderer, texture_player_2, NULL, &dstrect_player_2);
             SDL_RenderCopy(renderer, texture_turn, NULL, &dstrect_turn);
             play(renderer, table, state_of_game);
+            }
             SDL_Delay(30);
 
         }
@@ -241,6 +251,45 @@ void play(SDL_Renderer *renderer, Table* table, int* state_of_game) {
     }
 
     SDL_RenderPresent(renderer);
+}
+
+void drawMenu(SDL_Renderer *renderer) {
+    TTF_Font* police_menu_main = TTF_OpenFont("fonts/arial.ttf", 65);
+    TTF_Font* police_menu_inner = TTF_OpenFont("fonts/arial.ttf", 35);
+    SDL_Color couleurBlanche = {255, 255, 255};
+    SDL_Color couleurVerte = {0, 255, 0};
+    SDL_Color couleurClearBlue = {0, 255, 255};
+    SDL_Surface* text_menu_0 = TTF_RenderUTF8_Blended(police_menu_main, "Welcome to the Tic Tac Toe Game", couleurVerte);
+    SDL_Surface* text_menu_1 = TTF_RenderUTF8_Blended(police_menu_inner, "Press 's' or 'r' to start the game", couleurClearBlue);
+    SDL_Surface* text_menu_2 = TTF_RenderUTF8_Blended(police_menu_inner, "Press 'v' to change the mode to a 1v1 game or 'a' to play versus the AI", couleurClearBlue);
+    SDL_Surface* text_menu_3 = TTF_RenderUTF8_Blended(police_menu_inner, "Press any other key to leave the game", couleurClearBlue);
+    SDL_Texture* texture_menu_0 = SDL_CreateTextureFromSurface(renderer, text_menu_0);
+    SDL_Texture* texture_menu_1 = SDL_CreateTextureFromSurface(renderer, text_menu_1);
+    SDL_Texture* texture_menu_2 = SDL_CreateTextureFromSurface(renderer, text_menu_2);
+    SDL_Texture* texture_menu_3 = SDL_CreateTextureFromSurface(renderer, text_menu_3);
+    int texW_0 = 0, texH_0 = 0, texW_1 = 0, texH_1 = 0, texW_2 = 0, texH_2 = 0, texW_3 = 0, texH_3 = 0;
+
+    SDL_QueryTexture(texture_menu_0, NULL, NULL, &texW_0, &texH_0);
+    SDL_QueryTexture(texture_menu_1, NULL, NULL, &texW_1, &texH_1);
+    SDL_QueryTexture(texture_menu_2, NULL, NULL, &texW_2, &texH_2);
+    SDL_QueryTexture(texture_menu_3, NULL, NULL, &texW_3, &texH_3);
+    SDL_Rect dstrect_menu_0 = {SCREEN_WIDTH / 2 - (*text_menu_0).w / 2, SCREEN_HEIGHT*35/100 - (*text_menu_0).h / 2, texW_0, texH_0};
+    SDL_Rect dstrect_menu_1 = {SCREEN_WIDTH / 2 - (*text_menu_1).w / 2, SCREEN_HEIGHT*45/100 - (*text_menu_1).h / 2, texW_1, texH_1};
+    SDL_Rect dstrect_menu_2 = {SCREEN_WIDTH / 2 - (*text_menu_2).w / 2, SCREEN_HEIGHT*50/100 - (*text_menu_2).h / 2, texW_2, texH_2};
+    SDL_Rect dstrect_menu_3 = {SCREEN_WIDTH / 2 - (*text_menu_3).w / 2, SCREEN_HEIGHT*55/100 - (*text_menu_3).h / 2, texW_3, texH_3};
+
+    // draw baseline
+    SDL_RenderDrawLine(renderer, 0, GROUND_Y, SCREEN_WIDTH, GROUND_Y);
+    // draw square
+    SDL_RenderDrawLine(renderer, SCREEN_WIDTH*20/100, SCREEN_HEIGHT*25/100, SCREEN_WIDTH*80/100, SCREEN_HEIGHT*25/100);
+    SDL_RenderDrawLine(renderer, SCREEN_WIDTH*20/100, SCREEN_HEIGHT*65/100, SCREEN_WIDTH*80/100, SCREEN_HEIGHT*65/100);
+    SDL_RenderDrawLine(renderer, SCREEN_WIDTH*20/100, SCREEN_HEIGHT*25/100, SCREEN_WIDTH*20/100, SCREEN_HEIGHT*65/100);
+    SDL_RenderDrawLine(renderer, SCREEN_WIDTH*80/100, SCREEN_HEIGHT*25/100, SCREEN_WIDTH*80/100, SCREEN_HEIGHT*65/100);
+    // draw text
+    SDL_RenderCopy(renderer, texture_menu_0, NULL, &dstrect_menu_0);
+    SDL_RenderCopy(renderer, texture_menu_1, NULL, &dstrect_menu_1);
+    SDL_RenderCopy(renderer, texture_menu_2, NULL, &dstrect_menu_2);
+    SDL_RenderCopy(renderer, texture_menu_3, NULL, &dstrect_menu_3);
 }
 
 void drawBoard(SDL_Renderer *renderer, Table* table) {
