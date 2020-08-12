@@ -55,18 +55,25 @@ int main(int argc, char *argv[])
     SDL_Color couleurBlanche = {255, 255, 255};
     SDL_Color couleurVerte = {0, 255, 0};
     SDL_Color couleurBleue = {0, 0, 255};
+    SDL_Color couleurOrange = {205, 100, 30};
     SDL_Rect position;
     SDL_Surface* text_player_1 = TTF_RenderUTF8_Blended(police, "Player 1", couleurBlanche);
     SDL_Surface* text_player_2 = TTF_RenderUTF8_Blended(police, "Player 2", couleurBlanche);
+    SDL_Surface* text_player_ia = TTF_RenderUTF8_Blended(police, "IA", couleurOrange);
     SDL_Texture* texture_player_1 = SDL_CreateTextureFromSurface(renderer, text_player_1);
     SDL_Texture* texture_player_2 = SDL_CreateTextureFromSurface(renderer, text_player_2);
+    SDL_Texture* texture_player_ia = SDL_CreateTextureFromSurface(renderer, text_player_ia);
     int texW = 600;
     int texH = 600;
+    int texW_ia = 600;
+    int texH_ia = 600;
 
     SDL_QueryTexture(texture_player_1, NULL, NULL, &texW, &texH);
     SDL_QueryTexture(texture_player_2, NULL, NULL, &texW, &texH);
+    SDL_QueryTexture(texture_player_ia, NULL, NULL, &texW_ia, &texH_ia);
     SDL_Rect dstrect_player_1 ={ SCREEN_WIDTH * 2 / 100, 100, texW, texH };
-    SDL_Rect dstrect_player_2 ={ SCREEN_WIDTH * 98 / 100 - (*text_player_1).w, 100, texW, texH };
+    SDL_Rect dstrect_player_2 ={ SCREEN_WIDTH * 98 / 100 - (*text_player_2).w, 100, texW, texH };
+    SDL_Rect dstrect_player_ia = {SCREEN_WIDTH * 98 / 100 - (*text_player_ia).w, 100, texW_ia, texH_ia};
 
 
     if (!init_error)
@@ -84,6 +91,7 @@ int main(int argc, char *argv[])
         int turn = 0;
         bool roundEnded = true;
         bool inMenu = true;
+        bool ai_mode = false;
 
         char turn_string[100] = "Turn: ";
         char turn_s[100] = "";
@@ -95,7 +103,6 @@ int main(int argc, char *argv[])
         int texH2 = 600;
         SDL_QueryTexture(texture_turn, NULL, NULL, &texW2, &texH2);
         SDL_Rect dstrect_turn ={ SCREEN_WIDTH * 50 / 100 - (*text_turn).w, 0, texW2, texH2 };
-
 
 
         while (run) {
@@ -111,10 +118,17 @@ int main(int argc, char *argv[])
                 switch (event.type) {
                 case SDL_KEYDOWN:
                     switch (event.key.keysym.sym) {
+                    case SDLK_s:
                     case SDLK_r:
                         inMenu = false;
                         roundEnded = false;
                         resetStateOfGame(state_of_game, &turn);
+                        break;
+                    case SDLK_v:
+                        ai_mode = false;
+                        break;
+                    case SDLK_a:
+                        ai_mode = true;
                         break;
                     case SDLK_ESCAPE:
                         inMenu = true;
@@ -150,9 +164,15 @@ int main(int argc, char *argv[])
                     switch (event.type) {
                     case SDL_KEYDOWN:
                         switch (event.key.keysym.sym) {
+                        case SDLK_s:
+                            break;
                         case SDLK_r:
                             printf("r is pressed \n");
                             resetStateOfGame(state_of_game, &turn);
+                            break;
+                        case SDLK_ESCAPE:
+                            roundEnded = true;
+                            inMenu = true;
                             break;
                         default:
                             run = SDL_FALSE;
@@ -171,6 +191,7 @@ int main(int argc, char *argv[])
                                     char winner_string_1[100] = "Round ended, the winner is player 1, 'X'";
                                     char winner_string_2[100] = "Round ended, the winner is player 2, 'O'";
                                     char tie_string[100] = "Round ended, this is a tie";
+                                    
                                     if (w == 1) {
                                         text_turn = TTF_RenderUTF8_Blended(police, winner_string_1, couleurVerte);
                                     } else if (w == 2) {
@@ -178,13 +199,13 @@ int main(int argc, char *argv[])
                                     } else if (w == 3) {
                                         text_turn = TTF_RenderUTF8_Blended(police, tie_string, couleurBleue);
                                     }
+
                                     texture_turn = SDL_CreateTextureFromSurface(renderer, text_turn);
                                     SDL_QueryTexture(texture_turn, NULL, NULL, &texW2, &texH2);
                                     dstrect_turn.w = texW2;
                                     dstrect_turn.x = SCREEN_WIDTH * 50 / 100 - dstrect_turn.w / 2;
-
-
                                     roundEnded = true;
+                                    
                                 }
                             }
                         }
@@ -195,14 +216,16 @@ int main(int argc, char *argv[])
                 }
                 
                 if (!roundEnded) {
-
                     clearScreen(renderer);
                     SDL_RenderCopy(renderer, texture_player_1, NULL, &dstrect_player_1);
-                    SDL_RenderCopy(renderer, texture_player_2, NULL, &dstrect_player_2);
+                    if (ai_mode) {
+                        SDL_RenderCopy(renderer, texture_player_ia, NULL, &dstrect_player_ia);
+                    } else {
+                        SDL_RenderCopy(renderer, texture_player_2, NULL, &dstrect_player_2);
+                    }
                     SDL_RenderCopy(renderer, texture_turn, NULL, &dstrect_turn);
                     play(renderer, table, state_of_game);
                     SDL_Delay(30);
-
                 }
 
             }
@@ -211,10 +234,14 @@ int main(int argc, char *argv[])
             if (inMenu) {
                 drawMenu(renderer);
             } else {
-            SDL_RenderCopy(renderer, texture_player_1, NULL, &dstrect_player_1);
-            SDL_RenderCopy(renderer, texture_player_2, NULL, &dstrect_player_2);
-            SDL_RenderCopy(renderer, texture_turn, NULL, &dstrect_turn);
-            play(renderer, table, state_of_game);
+                SDL_RenderCopy(renderer, texture_player_1, NULL, &dstrect_player_1);
+                if (ai_mode) {
+                    SDL_RenderCopy(renderer, texture_player_ia, NULL, &dstrect_player_ia);
+                } else {
+                    SDL_RenderCopy(renderer, texture_player_2, NULL, &dstrect_player_2);
+                }
+                SDL_RenderCopy(renderer, texture_turn, NULL, &dstrect_turn);
+                play(renderer, table, state_of_game);
             }
             SDL_Delay(30);
 
@@ -260,7 +287,7 @@ void drawMenu(SDL_Renderer *renderer) {
     SDL_Color couleurVerte = {0, 255, 0};
     SDL_Color couleurClearBlue = {0, 255, 255};
     SDL_Surface* text_menu_0 = TTF_RenderUTF8_Blended(police_menu_main, "Welcome to the Tic Tac Toe Game", couleurVerte);
-    SDL_Surface* text_menu_1 = TTF_RenderUTF8_Blended(police_menu_inner, "Press 's' or 'r' to start the game", couleurClearBlue);
+    SDL_Surface* text_menu_1 = TTF_RenderUTF8_Blended(police_menu_inner, "Press 'o' or 'x' to choose player 1 piece. Press 's' or 'r' to start the game", couleurClearBlue);
     SDL_Surface* text_menu_2 = TTF_RenderUTF8_Blended(police_menu_inner, "Press 'v' to change the mode to a 1v1 game or 'a' to play versus the AI", couleurClearBlue);
     SDL_Surface* text_menu_3 = TTF_RenderUTF8_Blended(police_menu_inner, "Press any other key to leave the game", couleurClearBlue);
     SDL_Texture* texture_menu_0 = SDL_CreateTextureFromSurface(renderer, text_menu_0);
