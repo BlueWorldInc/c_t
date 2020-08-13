@@ -232,7 +232,7 @@ int main(int argc, char *argv[])
 
             clearScreen(renderer);
             if (inMenu) {
-                drawMenu(renderer);
+                drawMenu(renderer, ai_mode);
             } else {
                 SDL_RenderCopy(renderer, texture_player_1, NULL, &dstrect_player_1);
                 if (ai_mode) {
@@ -280,30 +280,41 @@ void play(SDL_Renderer *renderer, Table* table, int* state_of_game) {
     SDL_RenderPresent(renderer);
 }
 
-void drawMenu(SDL_Renderer *renderer) {
+void drawMenu(SDL_Renderer *renderer, bool ai_mode) {
     TTF_Font* police_menu_main = TTF_OpenFont("fonts/arial.ttf", 65);
     TTF_Font* police_menu_inner = TTF_OpenFont("fonts/arial.ttf", 35);
     SDL_Color couleurBlanche = {255, 255, 255};
     SDL_Color couleurVerte = {0, 255, 0};
     SDL_Color couleurClearBlue = {0, 255, 255};
+    SDL_Color couleurRouge = {255, 0, 0};
+    char mode_string[20] = "Actual mode: ";
+    if (ai_mode) {
+        strcat(mode_string, "AI");
+    } else {
+        strcat(mode_string, "1v1");
+    }
     SDL_Surface* text_menu_0 = TTF_RenderUTF8_Blended(police_menu_main, "Welcome to the Tic Tac Toe Game", couleurVerte);
     SDL_Surface* text_menu_1 = TTF_RenderUTF8_Blended(police_menu_inner, "Press 'o' or 'x' to choose player 1 piece. Press 's' or 'r' to start the game", couleurClearBlue);
     SDL_Surface* text_menu_2 = TTF_RenderUTF8_Blended(police_menu_inner, "Press 'v' to change the mode to a 1v1 game or 'a' to play versus the AI", couleurClearBlue);
     SDL_Surface* text_menu_3 = TTF_RenderUTF8_Blended(police_menu_inner, "Press any other key to leave the game", couleurClearBlue);
+    SDL_Surface* text_mode = TTF_RenderUTF8_Blended(police_menu_inner, mode_string, couleurRouge);
     SDL_Texture* texture_menu_0 = SDL_CreateTextureFromSurface(renderer, text_menu_0);
     SDL_Texture* texture_menu_1 = SDL_CreateTextureFromSurface(renderer, text_menu_1);
     SDL_Texture* texture_menu_2 = SDL_CreateTextureFromSurface(renderer, text_menu_2);
     SDL_Texture* texture_menu_3 = SDL_CreateTextureFromSurface(renderer, text_menu_3);
-    int texW_0 = 0, texH_0 = 0, texW_1 = 0, texH_1 = 0, texW_2 = 0, texH_2 = 0, texW_3 = 0, texH_3 = 0;
+    SDL_Texture* texture_mode = SDL_CreateTextureFromSurface(renderer, text_mode);
+    int texW_0 = 0, texH_0 = 0, texW_1 = 0, texH_1 = 0, texW_2 = 0, texH_2 = 0, texW_3 = 0, texH_3 = 0, texW_4 = 0, texH_4 = 0;
 
     SDL_QueryTexture(texture_menu_0, NULL, NULL, &texW_0, &texH_0);
     SDL_QueryTexture(texture_menu_1, NULL, NULL, &texW_1, &texH_1);
     SDL_QueryTexture(texture_menu_2, NULL, NULL, &texW_2, &texH_2);
     SDL_QueryTexture(texture_menu_3, NULL, NULL, &texW_3, &texH_3);
+    SDL_QueryTexture(texture_mode, NULL, NULL, &texW_4, &texH_4);
     SDL_Rect dstrect_menu_0 = {SCREEN_WIDTH / 2 - (*text_menu_0).w / 2, SCREEN_HEIGHT*35/100 - (*text_menu_0).h / 2, texW_0, texH_0};
     SDL_Rect dstrect_menu_1 = {SCREEN_WIDTH / 2 - (*text_menu_1).w / 2, SCREEN_HEIGHT*45/100 - (*text_menu_1).h / 2, texW_1, texH_1};
     SDL_Rect dstrect_menu_2 = {SCREEN_WIDTH / 2 - (*text_menu_2).w / 2, SCREEN_HEIGHT*50/100 - (*text_menu_2).h / 2, texW_2, texH_2};
     SDL_Rect dstrect_menu_3 = {SCREEN_WIDTH / 2 - (*text_menu_3).w / 2, SCREEN_HEIGHT*55/100 - (*text_menu_3).h / 2, texW_3, texH_3};
+    SDL_Rect dstrect_mode = {SCREEN_WIDTH / 2 - 270 / 2, SCREEN_HEIGHT*60/100 - (*text_mode).h / 2, texW_4, texH_4};
 
     // draw baseline
     SDL_RenderDrawLine(renderer, 0, GROUND_Y, SCREEN_WIDTH, GROUND_Y);
@@ -317,6 +328,7 @@ void drawMenu(SDL_Renderer *renderer) {
     SDL_RenderCopy(renderer, texture_menu_1, NULL, &dstrect_menu_1);
     SDL_RenderCopy(renderer, texture_menu_2, NULL, &dstrect_menu_2);
     SDL_RenderCopy(renderer, texture_menu_3, NULL, &dstrect_menu_3);
+    SDL_RenderCopy(renderer, texture_mode, NULL, &dstrect_mode);
 }
 
 void drawBoard(SDL_Renderer *renderer, Table* table) {
