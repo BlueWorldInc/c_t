@@ -85,6 +85,8 @@ int main(int argc, char *argv[])
         (*table).originX = SCREEN_WIDTH / 3;
         (*table).originY = SCREEN_HEIGHT / 10;
 
+        srand(time(NULL));
+
         // int state_of_game[9] = {0, 1, 0, 2, 1, 2, 0, 1, 2};
         int state_of_game[9] ={ 0 };
         int i = 0;
@@ -158,61 +160,88 @@ int main(int argc, char *argv[])
 
                 // SDL_RenderPresent(renderer);
 
-                // used https://wiki.libsdl.org/SDL_PollEvent to make it work without stuttering
-                while (SDL_PollEvent(&event)) {
+                if (turn % 2 == 1) {
+                    ai_play(state_of_game, 'X');
+                    turn++;
+                    int w =  winnerOfRound(state_of_game);
+                    if (w == 1 || w == 2 ||  w == 3) {
+                        char winner_string_1[100] = "Round ended, the winner is player 1, 'O'";
+                        char winner_string_2[100] = "Round ended, the winner is AI, 'X'";
+                        char tie_string[100] = "Round ended, this is a tie";
 
-                    switch (event.type) {
-                    case SDL_KEYDOWN:
-                        switch (event.key.keysym.sym) {
-                        case SDLK_s:
-                            break;
-                        case SDLK_r:
-                            printf("r is pressed \n");
-                            resetStateOfGame(state_of_game, &turn);
-                            break;
-                        case SDLK_ESCAPE:
-                            roundEnded = true;
-                            inMenu = true;
-                            break;
-                        default:
-                            run = SDL_FALSE;
-                            roundEnded = true;
-                            break;
+                        if (w == 1) {
+                            text_turn = TTF_RenderUTF8_Blended(police, winner_string_1, couleurVerte);
+                        } else if (w == 2) {
+                            text_turn = TTF_RenderUTF8_Blended(police, winner_string_2, couleurVerte);
+                        } else if (w == 3) {
+                            text_turn = TTF_RenderUTF8_Blended(police, tie_string, couleurBleue);
                         }
-                        break;
-                    case SDL_MOUSEBUTTONDOWN:
-                    {
-                        int az = positionOfClickOnBoard(table, event.button.x, event.button.y);
-                        if (az >= 0) {
-                            if (modifyStateOfGame(state_of_game, positionOfClickOnBoard(table, event.button.x, event.button.y), turn % 2) != 0) {
-                                turn++;
-                                int w =  winnerOfRound(state_of_game);
-                                if (w == 1 || w == 2 ||  w == 3) {
-                                    char winner_string_1[100] = "Round ended, the winner is player 1, 'X'";
-                                    char winner_string_2[100] = "Round ended, the winner is player 2, 'O'";
-                                    char tie_string[100] = "Round ended, this is a tie";
-                                    
-                                    if (w == 1) {
-                                        text_turn = TTF_RenderUTF8_Blended(police, winner_string_1, couleurVerte);
-                                    } else if (w == 2) {
-                                        text_turn = TTF_RenderUTF8_Blended(police, winner_string_2, couleurVerte);
-                                    } else if (w == 3) {
-                                        text_turn = TTF_RenderUTF8_Blended(police, tie_string, couleurBleue);
-                                    }
 
-                                    texture_turn = SDL_CreateTextureFromSurface(renderer, text_turn);
-                                    SDL_QueryTexture(texture_turn, NULL, NULL, &texW2, &texH2);
-                                    dstrect_turn.w = texW2;
-                                    dstrect_turn.x = SCREEN_WIDTH * 50 / 100 - dstrect_turn.w / 2;
-                                    roundEnded = true;
-                                    
+                        texture_turn = SDL_CreateTextureFromSurface(renderer, text_turn);
+                        SDL_QueryTexture(texture_turn, NULL, NULL, &texW2, &texH2);
+                        dstrect_turn.w = texW2;
+                        dstrect_turn.x = SCREEN_WIDTH * 50 / 100 - dstrect_turn.w / 2;
+                        roundEnded = true;
+
+                    }
+                } else {
+
+                    // used https://wiki.libsdl.org/SDL_PollEvent to make it work without stuttering
+                    while (SDL_PollEvent(&event)) {
+
+                        switch (event.type) {
+                        case SDL_KEYDOWN:
+                            switch (event.key.keysym.sym) {
+                            case SDLK_s:
+                                break;
+                            case SDLK_r:
+                                printf("r is pressed \n");
+                                resetStateOfGame(state_of_game, &turn);
+                                break;
+                            case SDLK_ESCAPE:
+                                roundEnded = true;
+                                inMenu = true;
+                                break;
+                            default:
+                                run = SDL_FALSE;
+                                roundEnded = true;
+                                break;
+                            }
+                            break;
+                        case SDL_MOUSEBUTTONDOWN:
+                        {
+                            int az = positionOfClickOnBoard(table, event.button.x, event.button.y);
+                            if (az >= 0) {
+                                if (modifyStateOfGame(state_of_game, positionOfClickOnBoard(table, event.button.x, event.button.y), turn % 2) != 0) {
+                                    turn++;
+                                    int w =  winnerOfRound(state_of_game);
+                                    if (w == 1 || w == 2 ||  w == 3) {
+                                        char winner_string_1[100] = "qRound ended, the winner is player 1, 'O'";
+                                        char winner_string_2[100] = "qRound ended, the winner is player 2, 'X'";
+                                        char tie_string[100] = "qRound ended, this is a tie";
+                                        
+                                        if (w == 1) {
+                                            text_turn = TTF_RenderUTF8_Blended(police, winner_string_1, couleurVerte);
+                                        } else if (w == 2) {
+                                            text_turn = TTF_RenderUTF8_Blended(police, winner_string_2, couleurVerte);
+                                        } else if (w == 3) {
+                                            text_turn = TTF_RenderUTF8_Blended(police, tie_string, couleurBleue);
+                                        }
+
+                                        texture_turn = SDL_CreateTextureFromSurface(renderer, text_turn);
+                                        SDL_QueryTexture(texture_turn, NULL, NULL, &texW2, &texH2);
+                                        dstrect_turn.w = texW2;
+                                        dstrect_turn.x = SCREEN_WIDTH * 50 / 100 - dstrect_turn.w / 2;
+                                        roundEnded = true;
+                                        
+                                    }
                                 }
                             }
                         }
-                    }
-                    break;
-                    }
+                        break;
+                        }
 
+                    }
                 }
                 
                 if (!roundEnded) {
@@ -406,6 +435,26 @@ void drawPieceOnBoard(SDL_Renderer *renderer, Table *table, int position, char s
         }
         else if (shape == 'X') {
             drawCross(renderer, 50, x, y);
+        }
+    }
+}
+
+void ai_play(int* state_of_game, char ia_piece) {
+    //play randomly
+    int ia_number = 0;
+    bool played = false;
+    if (ia_piece == 'O') {
+        ia_number = 1;
+    } else if (ia_piece == 'X') {
+        ia_number = 2;
+    }
+    int position = (rand() % (9 - 0 + 1)) + 0;
+    while (!played) {
+        if (state_of_game[position] == 0) {
+            state_of_game[position] = ia_number;
+            played = true;
+        } else {
+            position = (rand() % (9 - 0 + 1)) + 0;
         }
     }
 }

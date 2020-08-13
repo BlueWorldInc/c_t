@@ -18,7 +18,6 @@ struct Table {
     int size;
 };
 
-// void play(SDL_Renderer *renderer, Table* table);
 void play(SDL_Renderer *renderer, Table* table, int* state_of_game);
 void drawBoard(SDL_Renderer *renderer, Table *table);
 void drawPieceOnBoard(SDL_Renderer *renderer, Table *table, int position, char shape);
@@ -27,6 +26,6 @@ int modifyStateOfGame(int* state_of_game, int position, int turn);
 void resetStateOfGame(int* state_of_game, int* turn);
 int positionOfClickOnBoard(Table* table, int mousePositionX, int mousePositionY);
 int winnerOfRound(int* state_of_game);
-void reverse(char s[]);
 void clearScreen(SDL_Renderer* renderer);
 void drawMenu(SDL_Renderer *renderer, bool ai_mode);
+void ai_play(int* state_of_game, char ia_piece);
